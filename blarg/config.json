@@ -1,0 +1,11 @@
+{
+	"prod": "",
+	"test": "",
+	"logger": "INFO",
+	"filter": "",
+	"warn_on_unknown": "False",
+	"log_serialized": "True",
+	"fail_on_error": "False",
+	"src_filter": [],
+	"exclude": []
+}
