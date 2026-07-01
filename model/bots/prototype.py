@@ -179,15 +179,18 @@ class Prototype:
 
         # Interpolated movement — step toward next path node instead of teleporting
         if 'interp_target' not in self._misc or self._misc['interp_target'] is None:
-            self._misc['interp_target'] = self.game_state.map.path(self.game_state.player.coord, patrol_coord)
+            new_target = self.game_state.map.path(self.game_state.player.coord, patrol_coord)
+            if calculate_distance(self.game_state.player.coord, new_target) < 300:
+                self._misc['interp_target'] = new_target
 
         target = self._misc['interp_target']
         dist_to_target = calculate_distance(self.game_state.player.coord, target)
 
         if dist_to_target < 100:
             # Reached target, get next path node
-            self._misc['interp_target'] = self.game_state.map.path(self.game_state.player.coord, patrol_coord)
-            if self._misc['interp_target'] is not None:
+            new_target = self.game_state.map.path(self.game_state.player.coord, patrol_coord)
+            if new_target is not None and calculate_distance(self.game_state.player.coord, new_target) < 300:
+                self._misc['interp_target'] = new_target
                 target = self._misc['interp_target']
                 dist_to_target = calculate_distance(self.game_state.player.coord, target)
 
