@@ -17,8 +17,6 @@ class dm_initial(State):
         self.player_tracking = self.state_machine.game_state.get_closest_enemy_player()
         self.state_machine.target = self.state_machine.game_state.players[self.player_tracking].coord
 
-        self.state_machine.update_joystick_input_and_angle(self.state_machine.game_state.player.coord, self.state_machine.game_state.player.coord)
-
         target_distance = calculate_distance(self.state_machine.game_state.player.coord, self.state_machine.target)
         # Target too far!
         if target_distance > 2800:
@@ -27,11 +25,11 @@ class dm_initial(State):
 
         # Close range — circle strafe instead of jittering pathfinding
         if target_distance < 500:
-            self.state_machine.game_state.player.left_joystick_x = 127 + int(60 * (1 if int(self.state_machine.game_state.player.time / 500) % 2 == 0 else -1))
-            self.state_machine.game_state.player.left_joystick_y = 0
             self.state_machine.change_weapon('blitz')
             self.state_machine.fire_weapon(object_id=self.player_tracking)
-            self.state_machine.update_joystick_input_and_angle(self.state_machine.game_state.player.coord, self.state_machine.game_state.player.coord)
+            self.state_machine.game_state.player.left_joystick_x = 127 + int(110 * (1 if int(self.state_machine.game_state.player.time / 350) % 2 == 0 else -1))
+            self.state_machine.game_state.player.left_joystick_y = 0
+            self.state_machine.game_state.player.animation = None
             return
 
         if calculate_distance(self.starting_coord, self.state_machine.game_state.player.coord) > 1000 or self.patrol_coords == []:

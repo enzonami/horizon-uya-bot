@@ -93,7 +93,6 @@ class Map:
         content = await self.read_file(filepath)
         file_like_object = io.StringIO(content)
         G = nx.read_edgelist(file_like_object, nodetype=eval, delimiter='|')
-        G = self._normalize_graph(G)
         # Save pickle cache
         try:
             async with aiofiles.open(pkl_path, 'wb') as f:
@@ -117,7 +116,6 @@ class Map:
         content = await self.read_file(G_waypoint_path)
         file_like_object = io.StringIO(content)
         G_waypoints = nx.read_edgelist(file_like_object,nodetype=eval, delimiter='|')
-        G_waypoints = self._normalize_graph(G_waypoints)
 
         content = await self.read_file(waypoints_path)
         file_like_object = io.StringIO(content)
@@ -156,6 +154,14 @@ class Map:
         distances = distance.cdist(self.points, [coord], 'euclidean').flatten()
         if len(distances) > 0 and np.min(distances) < 20:
             return
+        # Skip air nodes — only add coordinates near ground level
+        if len(self.points) > 0:
+            xy_dists = distance.cdist(self.points[:, :2], [[coord[0], coord[1]]], 'euclidean').flatten()
+            nearby_xy = xy_dists < 100
+            if np.any(nearby_xy):
+                ground_z = np.min(self.points[nearby_xy, 2])
+                if coord[2] > ground_z + 300:
+                    return
         self.G.add_node(coord)
         mask = distances < connect_radius
         if np.any(mask):
