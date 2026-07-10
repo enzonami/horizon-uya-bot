@@ -49,9 +49,7 @@ class Map:
         logger.info(f"Loading map graph {self.map} ...")
         self.G = await self.read_graph(f"maps/graphs/{self.map}.edgelist")
 
-        components = list(nx.connected_components(self.G))
-        if len(components) != 1:
-            logger.warning(f"Graph has {len(components)} connected components (expected 1). Largest: {max(len(c) for c in components)}")
+        assert len(list(nx.connected_components(self.G))) == 1
 
         self.points = np.array(self.G.nodes)
         logger.info(f"Loaded map in {(datetime.now() - start_time).total_seconds():.2f} seconds!")
